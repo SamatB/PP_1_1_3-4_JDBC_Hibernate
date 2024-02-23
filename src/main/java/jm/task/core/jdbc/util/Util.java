@@ -28,12 +28,12 @@ public class Util {
     private static final SessionFactory sessionFactory = buildSessionFactory();
     private static SessionFactory buildSessionFactory() {
         Properties properties = new Properties();
-        properties.setProperty("connection.driver.class", "com.mysql.cj.jdbc.Driver");
+        properties.setProperty("hibernate.connection.driver.class", "com.mysql.jdbc.Driver");
         properties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/mydb");
         properties.setProperty("hibernate.connection.username", "user");
         properties.setProperty("hibernate.connection.password", "user");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+        properties.setProperty("hibernate.show_sql", "false");
         properties.setProperty("hibernate.hbm2ddl.auto", "create");
         Configuration cfg = new Configuration();
         cfg.addAnnotatedClass(jm.task.core.jdbc.model.User.class);

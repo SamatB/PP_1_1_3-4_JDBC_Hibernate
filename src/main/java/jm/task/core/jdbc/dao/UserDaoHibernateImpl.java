@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -19,7 +20,7 @@ public class UserDaoHibernateImpl implements UserDao {
                 "id serial primary key," +
                 "name varchar(50) not null," +
                 "last_name varchar(50) not null," +
-                "age int2);";
+                "age int);";
         SessionFactory sessionFactory = Util.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -70,12 +71,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        String sql = "select * from users";
-        List users;
+        List<User> users;
         SessionFactory sessionFactory = Util.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        users = session.createSQLQuery(sql).getResultList();
+        users = session.createQuery("from User", User.class).getResultList();
         session.getTransaction().commit();
         session.close();
         return users;
@@ -83,11 +83,10 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        String sql = "truncate users";
         SessionFactory sessionFactory = Util.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        session.createSQLQuery(sql);
+        session.createSQLQuery("truncate table users").executeUpdate();
         session.getTransaction().commit();
         System.out.println("Таблица пользователей была очищена");
         session.close();
