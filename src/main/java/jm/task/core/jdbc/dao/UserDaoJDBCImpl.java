@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    private final Connection connection = Util.connection();
     public UserDaoJDBCImpl() {
 
     }
@@ -18,7 +20,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 "name varchar(50) not null," +
                 "last_name varchar(50) not null," +
                 "age int2);";
-        try (Connection connection = Util.connection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
             System.out.println("Таблица с именем \"users\" создана!");
         } catch (SQLException e) {
@@ -28,7 +30,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
         String sql = "drop table if exists users";
-        try (Connection connection = Util.connection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
             System.out.println("Таблица удалена");
         } catch (SQLException e) {
@@ -38,7 +40,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         String sql = "insert into users(name, last_name, age) values (?, ?, ?);";
-        try (Connection connection = Util.connection(); PreparedStatement prostate = connection.prepareStatement(sql)) {
+        try (PreparedStatement prostate = connection.prepareStatement(sql)) {
             prostate.setString(1, name);
             prostate.setString(2, lastName);
             prostate.setByte(3, age);
@@ -51,7 +53,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         String sql = "delete from users where id = ?;";
-        try (Connection connection = Util.connection(); PreparedStatement prostate = connection.prepareStatement(sql)) {
+        try (PreparedStatement prostate = connection.prepareStatement(sql)) {
             prostate.setLong(1, id);
             prostate.executeUpdate();
             System.out.println("Пользователь с ID: " + id + " успешно удален");
@@ -64,7 +66,7 @@ public class UserDaoJDBCImpl implements UserDao {
         String sql = "select * from users;";
         List<User> users = new ArrayList<>();
         User user;
-        try (Connection conn = Util.connection(); Statement statement = conn.createStatement();
+        try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 user = new User();
@@ -82,7 +84,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         String sql = "truncate users";
-        try (Connection connection = Util.connection(); Statement statement = connection.createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
             System.out.println("Таблиц была очищена");
         } catch (SQLException e) {

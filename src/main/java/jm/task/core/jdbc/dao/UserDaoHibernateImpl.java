@@ -5,6 +5,7 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         Session session = sessionFactory.openSession();
-        String sql = "create table if not exists user(" +
+        String sql = "create table if not exists users (" +
                 "id serial primary key," +
                 "name varchar(50) not null," +
                 "last_name varchar(50) not null," +
@@ -33,13 +34,21 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        String sql = "drop table user";
+        String sql = "drop table if exists users";
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.createSQLQuery(sql);
-        session.getTransaction().commit();
-        System.out.println("Таблица пользователей успешно удалена");
-        session.close();
+        try {
+            session.beginTransaction();
+            session.createSQLQuery(sql);
+            session.getTransaction().commit();
+            System.out.println("Таблица пользователей успешно удалена");
+        } catch (IllegalStateException e) {
+            if (session.getTransaction().getStatus() == TransactionStatus.ACTIVE
+                    || session.getTransaction().getStatus() == TransactionStatus.MARKED_ROLLBACK) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            session.close();
+        }
     }
 
     @Override
@@ -81,7 +90,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        session.createSQLQuery("truncate table user").executeUpdate();
+        session.createSQLQuery("truncate table users").executeUpdate();
         session.getTransaction().commit();
         System.out.println("Таблица пользователей была очищена");
         session.close();
