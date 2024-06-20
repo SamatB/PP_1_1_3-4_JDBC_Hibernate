@@ -1,5 +1,6 @@
 package jm.task.core.jdbc.util;
 
+import lombok.Getter;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -25,7 +26,9 @@ public class Util {
         return connection;
     }
 
+    @Getter
     private static final SessionFactory sessionFactory = buildSessionFactory();
+
     private static SessionFactory buildSessionFactory() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.connection.driver.class", "com.mysql.jdbc.Driver");
@@ -41,9 +44,5 @@ public class Util {
         cfg.setProperties(properties);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties()).build();
         return cfg.buildSessionFactory(serviceRegistry);
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 }
